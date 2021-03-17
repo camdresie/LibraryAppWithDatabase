@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const sequelize = require('./models');
+const {sequelize} = require('./models');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -23,12 +23,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+/**
+ * Asynchronous error handling function that checks if a database connection has been successsfully established. If it has, a success message will be logged to the console.
+ * If not, there will be an unsuccessful message logged to the console. 
+ */
 (async () => {
   try {
     await sequelize.authenticate();
     console.log("Database connection successful!");
   } catch (error){
-    console.error("Database connection unsuccessful.");
+    console.error("Database connection unsuccessful." + error);
   }
 })();
 
