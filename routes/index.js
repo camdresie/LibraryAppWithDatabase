@@ -18,10 +18,7 @@ function asyncHandler(cb){
 
 /* GET home page. */
 router.get('/', asyncHandler(async(req, res, next) => {
-  const books = await Book.findAll();
-  res.redirect('/books');
-  res.json(books);
-  
+  res.redirect('/books'); 
 }));
 
 /* GET full list of books */
@@ -32,17 +29,39 @@ router.get('/books', asyncHandler(async(req, res, next) => {
 
 /* GET form for adding new book to library */
 router.get('/books/new', asyncHandler(async(req, res, next) => {
-  res.render('new-book', {title: "New Book"})
+  res.render('new-book', {title: "New Book"});
 }));
 
 /* POST route for adding new book to database */
-router.post('/books/new', asyncHandler(async(req, res, next) => {
-  
+router.post('/books/new', asyncHandler(async(req, res) => {
+  let book;
+  try {
+    book = await Book.create(req.body);
+    res.redirect("/books");
+  } catch (error) {
+    if (error.name === "SequelizeValidationError"){
+      article = await Article.build(req.body);
+      res.render("/books/new", {book, errors: error.errors, title: "New Book"})
+    } else {
+      throw error;
+    }
+  }
 }));
 
 /* GET book detail form */
 router.get('/books/:id', asyncHandler(async(req, res, next) => {
-
+  const book = await Book.findByPk(req.params.id);
+  if (book){
+    res.render('update-book', {
+      title: book.title,
+      book
+    });
+  } else {
+    const noBook = new Error();
+    noBook.message = "That book doesn't exist, sorry!"
+    noBook.status = 404;
+    throw noBook;
+  }
 }));
 
 /* POST to update book in database */
