@@ -36,20 +36,33 @@ app.use('/users', usersRouter);
   }
 })();
 
-// catch 404 and forward to error handler
+// catch 404 error and forward to global error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  const notFound = new Error();
+  notFound.status = 404;
+  notFound.message = "Sorry, the page wasn't found!"; 
+  next(notFound);
 });
 
-// error handler
+// error handler - will render not found page if the error is a 404 or will render a different page if the error is anything else
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  if (err.status == 404){
+    res.render('page-not-found', {err, title: "Page Not Found"});
+  } else {
+    // render the error page for errors other than 404
+    res.status(err.status || 500);
+    if (!err.status){
+      err.status = 500;
+    }
+    if (!err.message){
+      err.message = "Sorry, an error occurred! Try again";
+    }
+    console.log("Error status: " + err.status + "\nError message: " + err.message);
+    res.render('error', {err, title: "Page Not Found"});
+  }
 });
 
 module.exports = app;
