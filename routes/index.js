@@ -19,7 +19,40 @@ function asyncHandler(cb){
 /* GET home page. */
 router.get('/', asyncHandler(async(req, res, next) => {
   const books = await Book.findAll();
+  res.redirect('/books');
   res.json(books);
+  
+}));
+
+/* GET full list of books */
+router.get('/books', asyncHandler(async(req, res, next) => {
+  const books = await Book.findAll();
+  res.render('index', {title: "Books", books});
+}));
+
+/* GET form for adding new book to library */
+router.get('/books/new', asyncHandler(async(req, res, next) => {
+  res.render('new-book', {title: "New Book"})
+}));
+
+/* POST route for adding new book to database */
+router.post('/books/new', asyncHandler(async(req, res, next) => {
+  
+}));
+
+/* GET book detail form */
+router.get('/books/:id', asyncHandler(async(req, res, next) => {
+
+}));
+
+/* POST to update book in database */
+router.post('/books/:id', asyncHandler(async(req, res, next) => {
+
+}));
+
+/* POST route to delete a book from the database */
+router.post('/books/:id/delete', asyncHandler(async(req, res, next) => {
+
 }));
 
 module.exports = router;
