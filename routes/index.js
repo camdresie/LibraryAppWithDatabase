@@ -2,8 +2,13 @@ var express = require('express');
 var router = express.Router();
 const Book = require('../models').Book;;
 
-// This async Handler takes a callback function and prevents us from having to write try/catch blocks for every single route that makes a seqelize problem
-/* Handler function to wrap each route. */
+///////////////////////////////////
+///// HELPER FUNCTIONS
+///////////////////////////////////
+
+/**
+ * Handler function to wrap each route so we don't have to write try/catch blocks for each asynchronous function 
+ */
 function asyncHandler(cb){
   return async(req, res, next) => {
     try {
@@ -15,24 +20,37 @@ function asyncHandler(cb){
   }
 }
 
+///////////////////////////////////
+///// PAGE ROUTES
+///////////////////////////////////
 
-/* GET home page. */
+/**
+ * GET home page. 
+ */
 router.get('/', asyncHandler(async(req, res, next) => {
   res.redirect('/books'); 
 }));
 
-/* GET full list of books */
+/**
+ * GET full list of books in library.
+ */
 router.get('/books', asyncHandler(async(req, res, next) => {
   const books = await Book.findAll();
   res.render('index', {title: "Books", books});
 }));
 
-/* GET form for adding new book to library */
+/**
+ * GET form for adding new book to library.
+ */
 router.get('/books/new', asyncHandler(async(req, res, next) => {
   res.render('new-book', {title: "New Book"});
 }));
 
-/* POST route for adding new book to database */
+/**
+ * POST route for adding new book to database. This route also verifies that the title and author have been entered
+ * for a new book entry. If they have not, an error message is rendered saying that title and author are required
+ * (the exact message depends on which was left blank).
+ */
 router.post('/books/new', asyncHandler(async(req, res) => {
   let book;
   try {
@@ -48,7 +66,10 @@ router.post('/books/new', asyncHandler(async(req, res) => {
   }
 }));
 
-/* GET book detail form */
+/**
+ * GET book detail form. If a particular book does not exist in the database, this route generate a 404 error that 
+ * is picked up by the error handler in app.js.
+ */
 router.get('/books/:id', asyncHandler(async(req, res, next) => {
   const book = await Book.findByPk(req.params.id);
   if (book){
@@ -64,7 +85,11 @@ router.get('/books/:id', asyncHandler(async(req, res, next) => {
   }
 }));
 
-/* POST to update book in database */
+/**
+ * POST to update book in database. This route checks to make sure that the user hasn't left the title or author 
+ * fields empty after updating the book entry. If they have, the page is re-rendered with an error message depending
+ * on which they left blank.
+ */
 router.post('/books/:id', asyncHandler(async(req, res, next) => {
   let book;
   try {
@@ -79,14 +104,17 @@ router.post('/books/:id', asyncHandler(async(req, res, next) => {
     if (error.name === "SequelizeValidationError"){
       book = await Book.build(req.body);
       book.id = req.params.id;
-      res.render("/books/" + book.id, {book, errors: error.errors, title: book.title});
+      res.render("update-book", {book, errors: error.errors, title: book.title});
     } else {
       throw error;
     }
   }
 }));
 
-/* POST route to delete a book from the database */
+/**
+ * POST route to delete a book from the database. If the book doesn't exist, the user is routed to a friendly 404
+ * page by the 404 error handler in app.js.
+ */
 router.post('/books/:id/delete', asyncHandler(async(req, res, next) => {
   const book = await Book.findByPk(req.params.id);
   if (book){
