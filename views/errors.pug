@@ -1,0 +1,6 @@
+if(errors)
+  h2.errors Uh-oh! Some errors occurred while adding your book!
+  ul.errors
+    each error in errors
+      li
+        =error.message

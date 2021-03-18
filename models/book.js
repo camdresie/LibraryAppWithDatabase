@@ -1,8 +1,13 @@
 'use strict';
+
 const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
+
+  /**
+   * Book instance that takes in title, author, genre, and year of publication for adding to sequelize database.
+   */
   class Book extends Model {
     /**
      * Helper method for defining associations.
@@ -21,7 +26,9 @@ module.exports = (sequelize, DataTypes) => {
       notNull: {
         msg: "You must provide a book title",
       },
-      notEmpty: "You must provide a book title",
+      notEmpty: {
+        msg: "You must provide a book title"
+      }
      }
      
     },
@@ -32,7 +39,9 @@ module.exports = (sequelize, DataTypes) => {
        notNull: {
          msg: "You must provide an author name",
        },
-       notEmpty: "You must provide an author name",
+       notEmpty: {
+        msg: "You must provide a book title"
+        }
       }
     },
     genre: DataTypes.STRING,
