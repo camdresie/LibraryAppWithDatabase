@@ -71,7 +71,7 @@ router.post('/books/:id', asyncHandler(async(req, res, next) => {
     book = await Book.findByPk(req.params.id);
     if (book) {
       await book.update(req.body);
-      res.redirect("/books/" + book.id);
+      res.redirect("/books");
     } else {
       res.sendStatus(404);
     } 
@@ -88,7 +88,13 @@ router.post('/books/:id', asyncHandler(async(req, res, next) => {
 
 /* POST route to delete a book from the database */
 router.post('/books/:id/delete', asyncHandler(async(req, res, next) => {
-
+  const book = await Book.findByPk(req.params.id);
+  if (book){
+    await book.destroy();
+    res.redirect("/books");
+  } else {
+    res.sendStatus(404);
+  }
 }));
 
 module.exports = router;
